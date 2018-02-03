@@ -246,18 +246,23 @@ namespace MonoGame.Framework.WpfInterop
 				_sharedRenderTarget = null;
 			}
 
+			var sampleCount = 0;
 			if (_cachedRenderTarget != null)
 			{
+				// if there was a previous rendertarget, reuse it's sample count
+				sampleCount = _cachedRenderTarget.MultiSampleCount;
 				_cachedRenderTarget.Dispose();
 				_cachedRenderTarget = null;
 			}
 
 			int width = Math.Max((int)ActualWidth, 1);
 			int height = Math.Max((int)ActualHeight, 1);
+
 			CreateGraphicsDeviceDependentResources(new PresentationParameters
 			{
 				BackBufferWidth = width,
-				BackBufferHeight = height
+				BackBufferHeight = height,
+				MultiSampleCount = sampleCount
 			});
 		}
 
