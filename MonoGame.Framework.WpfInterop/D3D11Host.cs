@@ -197,10 +197,30 @@ namespace MonoGame.Framework.WpfInterop
 					var presentationParameters = new PresentationParameters
 					{
 						// Do not associate graphics device with window.
-						DeviceWindowHandle = IntPtr.Zero,
+						DeviceWindowHandle = IntPtr.Zero
 					};
-					_graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.HiDef, presentationParameters);
+					CreateSharedGraphicsDevice(presentationParameters);
 				}
+			}
+		}
+
+		private static void CreateSharedGraphicsDevice(PresentationParameters presentationParameters)
+		{
+			_graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.HiDef, presentationParameters);
+		}
+
+		/// <summary>
+		/// Helper that 
+		/// </summary>
+		/// <param name="pp"></param>
+		public void RecreateGraphicsDevice(PresentationParameters pp)
+		{
+			lock (_graphicsDeviceLock)
+			{
+				if (_graphicsDevice == null)
+					throw new NotSupportedException("Can only recreate graphicsdevice when one already exists. Initalize one first!");
+
+				CreateGraphicsDeviceDependentResources(pp);
 			}
 		}
 
@@ -234,15 +254,30 @@ namespace MonoGame.Framework.WpfInterop
 
 			int width = Math.Max((int)ActualWidth, 1);
 			int height = Math.Max((int)ActualHeight, 1);
+			CreateGraphicsDeviceDependentResources(new PresentationParameters
+			{
+				BackBufferWidth = width,
+				BackBufferHeight = height
+			});
+		}
+
+		private void CreateGraphicsDeviceDependentResources(PresentationParameters pp)
+		{
+			var width = pp.BackBufferWidth;
+			var height = pp.BackBufferHeight;
+			var ms = pp.MultiSampleCount;
+
 			_sharedRenderTarget = new RenderTarget2D(_graphicsDevice, width, height, false, SurfaceFormat.Bgr32,
-				DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents, true);
+					DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents, true);
 			_d3D11Image.SetBackBuffer(_sharedRenderTarget);
 
 			// internal rendertarget; all user draws render into this before we draw it to the actual back buffer
 			// that way flickering of screen will be prevented when under heavy system load (such as when using rendertargets on intel graphics: https://gitlab.com/MarcStan/MonoGame.Framework.WpfInterop/issues/12)
 			// -> always preserve its contents so worst case user gets to see the old screen again
 			_cachedRenderTarget = new RenderTarget2D(_graphicsDevice, width, height, false, SurfaceFormat.Bgr32,
-				DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents, false);
+				DepthFormat.Depth24Stencil8, ms, RenderTargetUsage.PreserveContents, false);
+
+			_spriteBatch = new SpriteBatch(_graphicsDevice);
 		}
 
 		private void InitializeImageSource()
@@ -303,7 +338,6 @@ namespace MonoGame.Framework.WpfInterop
 				InitializeGraphicsDevice();
 				_graphicsDeviceInitialized = true;
 			}
-			_spriteBatch = new SpriteBatch(_graphicsDevice);
 			InitializeImageSource();
 
 			// workaround for exceptions in Onloaded being swallowed by default on x64

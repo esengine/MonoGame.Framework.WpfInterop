@@ -26,13 +26,13 @@ namespace WpfTest.Scenes
 		private float _rotation;
 		private RasterizerState _wireframe;
 		private RasterizerState _filled;
-		private bool _msaa;
 		private TextComponent _msaaMessage;
+		private WpfGraphicsDeviceService _graphicsDeviceService;
 
 		protected override void Initialize()
 		{
 			_disposed = false;
-			new WpfGraphicsDeviceService(this);
+			_graphicsDeviceService = new WpfGraphicsDeviceService(this);
 			Components.Add(new FpsComponent(this));
 			Components.Add(new TimingComponent(this));
 			_msaaMessage = new TextComponent(this, GetMsaaMessage(), new Vector2(1, 0), HorizontalAlignment.Right);
@@ -77,7 +77,7 @@ namespace WpfTest.Scenes
 			base.Initialize();
 		}
 
-		private string GetMsaaMessage() => $"MSAA is {(_msaa ? "On" : "Off")}, press space to toggle";
+		private string GetMsaaMessage() => $"MSAA is {(_graphicsDeviceService.PreferMultiSampling ? "On" : "Off")}, press space to toggle";
 
 		private void SetupCube()
 		{
@@ -202,9 +202,11 @@ namespace WpfTest.Scenes
 			if (_keyboardState.IsKeyDown(Keys.Space) &&
 				previousKeyboardState.IsKeyUp(Keys.Space))
 			{
-				_msaa = !_msaa;
+				_graphicsDeviceService.PreferMultiSampling = !_graphicsDeviceService.PreferMultiSampling;
+				_graphicsDeviceService.ApplyChanges();
+
 				_msaaMessage.Text = GetMsaaMessage();
-				// TODO: toggle MSAA
+
 			}
 			base.Update(gameTime);
 		}
