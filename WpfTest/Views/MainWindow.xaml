@@ -19,6 +19,7 @@
 			<Button Width="180" Height="30" Content="Show scenes in tabs" Margin="5" Click="OpenTabbedGameWindow" />
 			<Button Width="180" Height="30" Content="Use Rendertarget" Margin="5" Click="OpenRendertargetGameWindow" />
 			<Button Width="180" Height="30" Content="Show closeable tabs" Margin="5" Click="OpenCloseableTabWindow" />
+			<Button Width="180" Height="30" Content="Show msaa" Margin="5" Click="OpenMsaaWindow" />
 		</StackPanel>
 		<scenes:CubeDemoScene Grid.Column="1" />
 	</Grid>

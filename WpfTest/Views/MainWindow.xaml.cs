@@ -63,5 +63,10 @@ namespace WpfTest.Views
 			TabScene.Counter = 0;
 			OpenWindow<CloseableTabWindow>();
 		}
+
+		private void OpenMsaaWindow(object sender, RoutedEventArgs e)
+		{
+			OpenCustomWindow(new MsaaScene(), "MSAA scnee");
+		}
 	}
 }
