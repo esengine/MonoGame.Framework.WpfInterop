@@ -28,6 +28,7 @@ namespace MonoGame.Framework.WpfInterop
 
 			GraphicsDevice = host.GraphicsDevice;
 			host.Services.AddService(typeof(IGraphicsDeviceService), this);
+			ApplyChanges();
 		}
 
 		#endregion
