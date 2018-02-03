@@ -54,9 +54,9 @@ namespace MonoGame.Framework.WpfInterop
 
 		public bool PreferMultiSampling { get; set; }
 
-		public int PreferredBackBufferWidth { get; set; } = 1024;
+		public int PreferredBackBufferWidth => (int)_host.ActualWidth;
 
-		public int PreferredBackBufferHeight { get; set; } = 768;
+		public int PreferredBackBufferHeight => (int)_host.ActualHeight;
 
 		#endregion
 
@@ -81,11 +81,13 @@ namespace MonoGame.Framework.WpfInterop
 		{
 			// set to windows limit, if gpu doesn't support it, monogame will autom. scale it down to the next supported level
 			const int msaaLimit = 32;
+			var w = Math.Max((int) _host.ActualWidth, 1);
+			var h = Math.Max((int) _host.ActualHeight, 1);
 			var pp = new PresentationParameters
 			{
 				MultiSampleCount = PreferMultiSampling ? msaaLimit : 0,
-				BackBufferWidth = PreferredBackBufferWidth,
-				BackBufferHeight = PreferredBackBufferHeight,
+				BackBufferWidth = w,
+				BackBufferHeight = h,
 				DeviceWindowHandle = IntPtr.Zero
 			};
 			// TODO: would be so easy to just call reset. but for some reason monogame doesn't want the WindowHandle to be null on reset (but it's totally fine to be null on create)
