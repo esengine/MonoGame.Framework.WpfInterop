@@ -1,6 +1,6 @@
 # MonoGame WPF Interop
 
-This adds WPF support to MonoGame (tested with version 3.5.1.1679).
+This adds WPF support to MonoGame (tested with version 3.5.1.1679 and 3.6.x).
 
 Note that you **need** MonoGame.Framework.WindowsDX (as this interop uses SharpDX). WPF only supports DirectX.
 
@@ -167,6 +167,10 @@ Update/Draw are still called for all inactive tabs and any inactive tab has the 
 * Properly implement GraphicsDeviceService (call all events when appropriate)
 
 # Changelog
+
+**v1.5.3.999 (not an official release)**
+
+* implemented MSAA based on latest monogame develop branch state (requires using this fork with important fixes: https://github.com/MarcStan/MonoGame)
 
 **v1.5.3**
 
