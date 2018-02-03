@@ -68,5 +68,10 @@ namespace WpfTest.Views
 		{
 			OpenCustomWindow(new MsaaScene(), "MSAA scnee");
 		}
+
+		private void OpenMultipleMsaaWindow(object sender, RoutedEventArgs e)
+		{
+			OpenWindow<MultiMsaaWindow>();
+		}
 	}
 }
