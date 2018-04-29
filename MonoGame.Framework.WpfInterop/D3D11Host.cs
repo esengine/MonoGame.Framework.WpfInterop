@@ -41,9 +41,10 @@ namespace MonoGame.Framework.WpfInterop
 		/// This prevents flickering of the screen when WPF decides to draw the rendertarget to screen while monogame is midway populating it.
 		/// </summary>
 		private RenderTarget2D _cachedRenderTarget;
-		private bool _resetBackBuffer;
+		private bool _resetBackBuffer, _dpiChanged;
 		private bool _isActive;
 		private SpriteBatch _spriteBatch;
+		private double _dpiScalingFactor = 1;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="D3D11Host"/> class.
@@ -113,6 +114,27 @@ namespace MonoGame.Framework.WpfInterop
 					else
 						Deactivated?.Invoke(this, EventArgs.Empty);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the scaling factor that is applied to the attached gamecontrol.
+		/// For legacy compatibility this always defaults to a factor of 1.
+		/// If your monitor is scaled at 200%, then this will cause the game to render at only half the size.
+		/// In order to render at full native resolution, set this value to the correct <see cref="SystemDpiScalingFactor"/>.
+		/// </summary>
+		public double DpiScalingFactor
+		{
+			get => _dpiScalingFactor;
+			set
+			{
+				if (value <= 0)
+					throw new ArgumentOutOfRangeException(nameof(DpiScalingFactor), "value must be positive");
+				if (_dpiScalingFactor == value)
+					return;
+
+				_dpiScalingFactor = value;
+				_dpiChanged = true;
 			}
 		}
 
@@ -255,8 +277,8 @@ namespace MonoGame.Framework.WpfInterop
 				_cachedRenderTarget = null;
 			}
 
-			int width = Math.Max((int)ActualWidth, 1);
-			int height = Math.Max((int)ActualHeight, 1);
+			int width = (int)(Math.Max(ActualWidth, 1) * DpiScalingFactor);
+			int height = (int)(Math.Max(ActualHeight, 1) * DpiScalingFactor);
 
 			CreateGraphicsDeviceDependentResources(new PresentationParameters
 			{
@@ -428,8 +450,11 @@ namespace MonoGame.Framework.WpfInterop
 				return;
 
 			// Recreate back buffer if necessary.
-			if (_resetBackBuffer)
+			if (_resetBackBuffer || _dpiChanged)
+			{
 				CreateBackBuffer();
+				_dpiChanged = false;
+			}
 
 			// CompositionTarget.Rendering event may be raised multiple times per frame
 			// (e.g. during window resizing).

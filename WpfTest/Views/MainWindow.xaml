@@ -21,6 +21,7 @@
 			<Button Width="180" Height="30" Content="Show closeable tabs" Margin="5" Click="OpenCloseableTabWindow" />
 			<Button Width="180" Height="30" Content="Show msaa" Margin="5" Click="OpenMsaaWindow" />
 			<Button Width="180" Height="30" Content="Show multiple msaa scenes" Margin="5" Click="OpenMultipleMsaaWindow" />
+			<Button Width="180" Height="30" Content="Show dpi scaling scene" Margin="5" Click="OpenDpiScalingWindow" />
 		</StackPanel>
 		<scenes:CubeDemoScene Grid.Column="1" />
 	</Grid>
